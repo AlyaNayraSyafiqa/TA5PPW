@@ -20,8 +20,8 @@ Kalkulator interaktif ini dibuat menggunakan HTML, CSS (TailwindCSS), dan JavaSc
 ### 3. Shortcut Keyboard:
    - Angka: Tekan angka dari 0 hingga 9 untuk memasukkan nilai.
    - Operasi Matematika: Tekan tombol berikut untuk operasi:
-     - + untuk penjumlahan (klik +)
-     - - untuk pengurangan (klik -)
+     - (+) untuk penjumlahan (klik +)
+     - (-) untuk pengurangan (klik -)
      - × untuk perkalian (klik *)
      - ÷ untuk pembagian (klik /)
    - Tombol Kembali (Hapus): Tekan Backspace untuk menghapus karakter terakhir yang dimasukkan.
