@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kalkulator</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    .display { font-variant-numeric: tabular-nums; word-wrap: break-word; }
+    .history-scroll { max-height: 10rem; overflow-y: auto; }
+
+    .mode-pink .btn-op { background-color: #ff84a1; color: white; }
+    .mode-pink .btn-op:hover { background-color: #ff6b8e; }
+
+    .mode-pink .btn-num { background-color: #fff; }
+    .mode-pink .btn-num:hover { background-color: #f1f1f1; }
+
+    .mode-pink .btn-action { background-color: #ff4976; color: white; }
+    .mode-pink .btn-action:hover { background-color: #ff335f; }
+
+    .mode-pink .btn-eq { background-color: #ff70a3; color: white; }
+    .mode-pink .btn-eq:hover { background-color: #ff5691; }
+
+    .mode-pink body { background-color: #ffffff; }
+
+    .mode-clean .btn-op,
+    .mode-clean .btn-num,
+    .mode-clean .btn-action,
+    .mode-clean .btn-eq {
+      background-color: white;
+      border: 1px solid #ddd;
+      color: #4a4a4a;
+    }
+    .mode-clean .btn-op:hover,
+    .mode-clean .btn-num:hover,
+    .mode-clean .btn-action:hover,
+    .mode-clean .btn-eq:hover {
+      background-color: #f2f2f2;
+    }
+    .mode-clean body { background-color: white; }
+
+    .toggle-circle { transition: transform .2s; }
+  </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-4 mode-pink">
+
+  <main class="w-full max-w-xl">
+    <div class="bg-white shadow-lg rounded-2xl p-4 sm:p-6">
+
+      <div class="flex items-center justify-between mb-4">
+        <h1 class="text-2xl font-semibold">Kalkulator</h1>
+
+        <label class="flex items-center cursor-pointer">
+          <span class="mr-2 text-sm">Pink</span>
+          <div class="relative w-12 h-6 bg-pink-200 rounded-full">
+            <input id="modeToggle" type="checkbox" class="hidden">
+            <div id="toggleDot" class="absolute w-5 h-5 bg-white rounded-full top-0.5 left-0.5 toggle-circle"></div>
+          </div>
+        </label>
+      </div>
+
+      <div class="mb-4">
+        <div class="rounded-lg border border-slate-200 p-3 bg-slate-50">
+          <div id="historySmall" class="text-sm text-slate-400 min-h-[1rem]"></div>
+          <div id="display" class="display text-right text-3xl sm:text-4xl font-mono leading-tight break-words">
+            0
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-4 gap-2">
+
+        <button id="mc" class="py-3 rounded-lg btn-op">MC</button>
+        <button id="mr" class="py-3 rounded-lg btn-op">MR</button>
+        <button id="mPlus" class="py-3 rounded-lg btn-op">M+</button>
+        <button id="mMinus" class="py-3 rounded-lg btn-op">M-</button>
+
+        <button id="ce" class="py-3 rounded-lg btn-action">CE</button>
+        <button id="c" class="py-3 rounded-lg btn-action">C</button>
+        <button id="back" class="py-3 rounded-lg btn-num">⌫</button>
+        <button data-op="÷" class="py-3 rounded-lg btn-op">÷</button>
+
+        <button data-num="7" class="py-3 rounded-lg btn-num">7</button>
+        <button data-num="8" class="py-3 rounded-lg btn-num">8</button>
+        <button data-num="9" class="py-3 rounded-lg btn-num">9</button>
+        <button data-op="×" class="py-3 rounded-lg btn-op">×</button>
+
+        <button data-num="4" class="py-3 rounded-lg btn-num">4</button>
+        <button data-num="5" class="py-3 rounded-lg btn-num">5</button>
+        <button data-num="6" class="py-3 rounded-lg btn-num">6</button>
+        <button data-op="-" class="py-3 rounded-lg btn-op">−</button>
+
+        <button data-num="1" class="py-3 rounded-lg btn-num">1</button>
+        <button data-num="2" class="py-3 rounded-lg btn-num">2</button>
+        <button data-num="3" class="py-3 rounded-lg btn-num">3</button>
+        <button data-op="+" class="py-3 rounded-lg btn-op">+</button>
+
+        <button data-num="0" class="col-span-2 py-3 rounded-lg btn-num">0</button>
+        <button id="dot" class="py-3 rounded-lg btn-num">.</button>
+        <button id="equals" class="py-3 rounded-lg btn-eq">=</button>
+      </div>
+
+      <div class="mt-4 grid grid-cols-2 gap-4">
+        <div class="bg-slate-50 p-3 rounded-lg">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-sm font-medium">History</h3>
+            <button id="clearHistory" class="text-xs text-slate-500 hover:underline">Clear</button>
+          </div>
+          <div id="historyList" class="history-scroll text-sm text-slate-700"></div>
+        </div>
+
+        <div class="bg-slate-50 p-3 rounded-lg">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-sm font-medium">Memory</h3>
+            <div id="memIndicator" class="text-xs text-slate-500">MC</div>
+          </div>
+          <div class="text-lg font-mono" id="memValue">0</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const tambah = (a, b) => a + b;
+    const kurang = (a, b) => a - b;
+    const kali = (a, b) => a * b;
+    const bagi = (a, b) => b !== 0 ? a / b : "Tidak bisa dibagi nol";
+
+    let expression = "";
+    let memory = 0;
+    const history = [];
+
+    const displayEl = document.getElementById("display");
+
+    function updateDisplay() {
+      displayEl.innerText = expression || "0";
+    }
+
+    function showError(msg) {
+      displayEl.innerHTML = `<p class="text-red-500 text-lg">${msg}</p>`;
+      setTimeout(() => updateDisplay(), 1500);
+    }
+
+    function resetKalkulator() {
+      expression = "";
+      memory = 0;
+      history.length = 0;
+      updateMemoryUI();
+      renderHistory();
+      updateDisplay();
+    }
+
+    function clearEntry() {
+      const lastOp = Math.max(
+        expression.lastIndexOf("+"),
+        expression.lastIndexOf("-"),
+        expression.lastIndexOf("×"),
+        expression.lastIndexOf("÷")
+      );
+      expression = lastOp === -1 ? "" : expression.slice(0, lastOp + 1);
+      updateDisplay();
+    }
+
+    function backspace() {
+      expression = expression.slice(0, -1);
+      updateDisplay();
+    }
+
+    function appendNumber(n) {
+      expression += n;
+      updateDisplay();
+    }
+
+    function appendOperator(op) {
+      if (expression === "" && op !== "-") return;
+      if (/[+\-×÷]$/.test(expression))
+        expression = expression.slice(0, -1);
+      expression += op;
+      updateDisplay();
+    }
+
+    function appendDot() {
+      const parts = expression.split(/([+\-×÷])/);
+      const last = parts[parts.length - 1];
+      if (last.includes(".")) return;
+      expression += expression === "" || /[+\-×÷]$/.test(expression) ? "0." : ".";
+      updateDisplay();
+    }
+
+    function evaluateExpression() {
+      if (!expression) return;
+
+      const safeExpr = expression.replace(/×/g, "*").replace(/÷/g, "/");
+
+      if (!/^[0-9.\s+\-*/()]+$/.test(safeExpr)) {
+        showError("Ekspresi tidak valid");
+        return;
+      }
+
+      try {
+        let result = Function(`"use strict"; return (${safeExpr})`)();
+
+        if (!Number.isFinite(result)) {
+          showError("Tidak bisa dibagi nol");
+          return;
+        }
+
+        addHistory(expression, result);
+        expression = String(result);
+        updateDisplay();
+
+      } catch {
+        showError("Error");
+      }
+    }
+
+    const historyListEl = document.getElementById("historyList");
+
+    function addHistory(expr, result) {
+      history.push({ expr, result });
+      if (history.length > 5) history.shift();
+      renderHistory();
+    }
+
+    function renderHistory() {
+      historyListEl.innerHTML =
+        history
+          .map(
+            h => `<div class="border-b py-1 text-sm">${h.expr} = <b>${h.result}</b></div>`
+          )
+          .join("") || `<div class="text-slate-400">Belum ada history</div>`;
+    }
+
+    const memValueEl = document.getElementById("memValue");
+    const memIndicatorEl = document.getElementById("memIndicator");
+
+    function updateMemoryUI() {
+      memValueEl.innerText = memory;
+      memIndicatorEl.innerText = memory !== 0 ? "M" : "MC";
+    }
+
+    document.getElementById("mc").onclick = () => { memory = 0; updateMemoryUI(); };
+    document.getElementById("mr").onclick = () => { expression = String(memory); updateDisplay(); };
+    document.getElementById("mPlus").onclick = () => { memory += parseFloat(expression || "0"); updateMemoryUI(); };
+    document.getElementById("mMinus").onclick = () => { memory -= parseFloat(expression || "0"); updateMemoryUI(); };
+
+    document.getElementById("equals").onclick = evaluateExpression;
+    document.getElementById("ce").onclick = clearEntry;
+    document.getElementById("c").onclick = resetKalkulator;
+    document.getElementById("back").onclick = backspace;
+    document.getElementById("dot").onclick = appendDot;
+    document.getElementById("clearHistory").onclick = () => { history.length = 0; renderHistory(); };
+
+    document.querySelectorAll("[data-num]").forEach(btn =>
+      btn.addEventListener("click", () => appendNumber(btn.dataset.num))
+    );
+
+    document.querySelectorAll("[data-op]").forEach(btn =>
+      btn.addEventListener("click", () => appendOperator(btn.dataset.op))
+    );
+
+    window.addEventListener("keydown", e => {
+      if (/^[0-9]$/.test(e.key)) appendNumber(e.key);
+      if ("+-*/".includes(e.key)) {
+        const map = { "*": "×", "/": "÷" };
+        appendOperator(map[e.key] || e.key);
+      }
+      if (e.key === "Enter") evaluateExpression();
+      if (e.key === "Backspace") backspace();
+      if (e.key === "Escape") resetKalkulator();
+      if (e.key === ".") appendDot();
+    });
+
+    const toggle = document.getElementById("modeToggle");
+    const dot = document.getElementById("toggleDot");
+
+    toggle.addEventListener("change", () => {
+      if (toggle.checked) {
+        document.body.classList.remove("mode-pink");
+        document.body.classList.add("mode-clean");
+        dot.style.transform = "translateX(1.5rem)";
+      } else {
+        document.body.classList.remove("mode-clean");
+        document.body.classList.add("mode-pink");
+        dot.style.transform = "translateX(0rem)";
+      }
+    });
+
+    updateDisplay();
+    updateMemoryUI();
+    renderHistory();
+  </script>
+</body>
+</html>
