@@ -272,6 +272,7 @@
       if (e.key === "Backspace") backspace();
       if (e.key === "Escape") resetKalkulator();
       if (e.key === ".") appendDot();
+      if (e.key === "Delete") clearEntry();  
     });
 
     const toggle = document.getElementById("modeToggle");
@@ -295,3 +296,4 @@
   </script>
 </body>
 </html>
+
