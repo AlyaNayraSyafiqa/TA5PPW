@@ -24,7 +24,7 @@ Kalkulator interaktif ini dibuat menggunakan HTML, CSS (TailwindCSS), dan JavaSc
      - (-) untuk pengurangan (klik -)
      - × untuk perkalian (klik *)
      - ÷ untuk pembagian (klik /)
-   - Tombol Kembali (Hapus): Tekan Backspace untuk menghapus karakter terakhir yang dimasukkan.
+   - Tombol Del : Tekan Backspace untuk menghapus karakter terakhir yang dimasukkan.
    - Tombol C: Tekan Esc untuk menghapus seluruh ekspresi.
    - Tombol CE: Tekan Delete untuk menghapus input terakhir.
    - Tombol Equals (=): Tekan Enter untuk menghitung hasil dari ekspresi matematika.
@@ -44,6 +44,8 @@ Kalkulator interaktif ini dibuat menggunakan HTML, CSS (TailwindCSS), dan JavaSc
   - M-: Mengurangi nilai layar dari memori.
 - Keyboard Shortcuts: Menggunakan keyboard untuk memasukkan angka, operasi, dan tombol lainnya.
 - Responsif Desktop dan Mobile
-  <img width="1919" height="963" alt="Cuplikan layar 2025-11-23 230538" src="https://github.com/user-attachments/assets/ca530f1b-751d-49fc-bf0d-ce4a10c4817f" />
-  <img width="388" height="897" alt="Cuplikan layar 2025-11-23 230612" src="https://github.com/user-attachments/assets/4de43ca8-aa95-4aba-9bd1-a464b9449012" />
+<img width="1919" height="903" alt="image" src="https://github.com/user-attachments/assets/15322ab3-e077-40d6-a04c-caaa2beabfed" />
+<img width="1919" height="912" alt="image" src="https://github.com/user-attachments/assets/41b5b67f-946e-4078-ba4b-8e164bdc9c17" />
+<img width="433" height="893" alt="image" src="https://github.com/user-attachments/assets/88f4efea-2f74-4263-9bf3-3afe3fcbfd33" />
+
 
