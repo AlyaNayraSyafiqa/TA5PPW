@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />  
   <title>Kalkulator</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
@@ -14,7 +14,7 @@
     .mode-pink .btn-op { background-color: #ff84a1; color: white; }
     .mode-pink .btn-op:hover { background-color: #ff6b8e; }
 
-    .mode-pink .btn-num { background-color: #fff; }
+    .mode-pink .btn-num { background-color: #fff;  border: 1px solid #ddd; }
     .mode-pink .btn-num:hover { background-color: #f1f1f1; }
 
     .mode-pink .btn-action { background-color: #ff4976; color: white; }
@@ -54,7 +54,7 @@
         <h1 class="text-2xl font-semibold">Kalkulator</h1>
 
         <label class="flex items-center cursor-pointer">
-          <span class="mr-2 text-sm">Pink</span>
+          <span class="mr-2 text-sm">Tema</span>
           <div class="relative w-12 h-6 bg-pink-200 rounded-full">
             <input id="modeToggle" type="checkbox" class="hidden">
             <div id="toggleDot" class="absolute w-5 h-5 bg-white rounded-full top-0.5 left-0.5 toggle-circle"></div>
@@ -80,7 +80,7 @@
 
         <button id="ce" class="py-3 rounded-lg btn-action">CE</button>
         <button id="c" class="py-3 rounded-lg btn-action">C</button>
-        <button id="back" class="py-3 rounded-lg btn-num">⌫</button>
+        <button id="back" class="py-3 rounded-lg btn-num">Del</button>
         <button data-op="÷" class="py-3 rounded-lg btn-op">÷</button>
 
         <button data-num="7" class="py-3 rounded-lg btn-num">7</button>
@@ -134,14 +134,18 @@
     const history = [];
 
     const displayEl = document.getElementById("display");
+    const historyListEl = document.getElementById("historyList");
+    const memValueEl = document.getElementById("memValue");
+    const memIndicatorEl = document.getElementById("memIndicator");
+    const toggle = document.getElementById("modeToggle");
+    const dot = document.getElementById("toggleDot");
 
     function updateDisplay() {
       displayEl.innerText = expression || "0";
     }
 
     function showError(msg) {
-      displayEl.innerHTML = `<p class="text-red-500 text-lg">${msg}</p>`;
-      setTimeout(() => updateDisplay(), 1500);
+      alert("Error: " + msg);
     }
 
     function resetKalkulator() {
@@ -186,38 +190,90 @@
       const parts = expression.split(/([+\-×÷])/);
       const last = parts[parts.length - 1];
       if (last.includes(".")) return;
-      expression += expression === "" || /[+\-×÷]$/.test(expression) ? "0." : ".";
+      expression += expression === "" || /[+\-×÷]$/.test(expression) ? "0." : "." ;
       updateDisplay();
     }
 
     function evaluateExpression() {
       if (!expression) return;
+      const tokens = expression
+          .match(/(\-?\d+\.?\d*)|[+\-×÷]/g)
+          .filter(Boolean); 
 
-      const safeExpr = expression.replace(/×/g, "*").replace(/÷/g, "/");
-
-      if (!/^[0-9.\s+\-*/()]+$/.test(safeExpr)) {
-        showError("Ekspresi tidak valid");
-        return;
+      if (!tokens || tokens.length === 0) {
+          showError("Ekspresi tidak valid");
+          return;
       }
+      
+      let values = [];
+      let ops = [];
+
+      const precedence = { '+': 1, '-': 1, '×': 2, '÷': 2 };
+
+      const applyOp = (op, b, a) => {
+          switch (op) {
+              case '+': return tambah(a, b);
+              case '-': return kurang(a, b);
+              case '×': return kali(a, b);
+              case '÷': return bagi(a, b);
+          }
+      };
+
+      const processOp = (op) => {
+          const val2 = values.pop();
+          const val1 = values.pop();
+          const result = applyOp(op, val2, val1);
+          
+          if (result === "Tidak bisa dibagi nol") {
+            throw new Error(result);
+          }
+          values.push(result);
+      };
 
       try {
-        let result = Function(`"use strict"; return (${safeExpr})`)();
+         
+          for (const token of tokens) {
+              if (!isNaN(parseFloat(token))) {
+                  values.push(parseFloat(token));
+              } else {
+                  while (
+                      ops.length > 0 &&
+                      precedence[ops[ops.length - 1]] >= precedence[token]
+                  ) {
+                      processOp(ops.pop());
+                  }
+                  ops.push(token);
+              }
+          }
 
-        if (!Number.isFinite(result)) {
-          showError("Tidak bisa dibagi nol");
-          return;
-        }
+          while (ops.length > 0) {
+              processOp(ops.pop());
+          }
 
-        addHistory(expression, result);
-        expression = String(result);
-        updateDisplay();
+          if (values.length !== 1) {
+              showError("Ekspresi tidak valid");
+              return;
+          }
 
-      } catch {
-        showError("Error");
+          const result = values[0];
+
+          if (typeof result === 'string' && result.includes("nol")) {
+              showError(result);
+              return;
+          }
+          if (!Number.isFinite(result)) {
+              showError("Hasil tidak terbatas (Infinitas)");
+              return;
+          }
+
+          addHistory(expression, result);
+          expression = String(result);
+          updateDisplay();
+
+      } catch (e) {
+          showError(e.message || "Error saat menghitung");
       }
     }
-
-    const historyListEl = document.getElementById("historyList");
 
     function addHistory(expr, result) {
       history.push({ expr, result });
@@ -233,9 +289,6 @@
           )
           .join("") || `<div class="text-slate-400">Belum ada history</div>`;
     }
-
-    const memValueEl = document.getElementById("memValue");
-    const memIndicatorEl = document.getElementById("memIndicator");
 
     function updateMemoryUI() {
       memValueEl.innerText = memory;
@@ -272,11 +325,8 @@
       if (e.key === "Backspace") backspace();
       if (e.key === "Escape") resetKalkulator();
       if (e.key === ".") appendDot();
-      if (e.key === "Delete") clearEntry();  
+      if (e.key === "Delete") clearEntry();
     });
-
-    const toggle = document.getElementById("modeToggle");
-    const dot = document.getElementById("toggleDot");
 
     toggle.addEventListener("change", () => {
       if (toggle.checked) {
@@ -296,4 +346,3 @@
   </script>
 </body>
 </html>
-
