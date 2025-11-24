@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kalkulator</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="script.js" defer></script>
+
+  <style>
+    .display { font-variant-numeric: tabular-nums; word-wrap: break-word; }
+    .history-scroll { max-height: 10rem; overflow-y: auto; }
+
+    .mode-pink .btn-op { background-color: #ff84a1; color: white; }
+    .mode-pink .btn-op:hover { background-color: #ff6b8e; }
+
+    .mode-pink .btn-num { background-color: #fff;  border: 1px solid #ddd; }
+    .mode-pink .btn-num:hover { background-color: #f1f1f1; }
+
+    .mode-pink .btn-action { background-color: #ff4976; color: white; }
+    .mode-pink .btn-action:hover { background-color: #ff335f; }
+
+    .mode-pink .btn-eq { background-color: #ff70a3; color: white; }
+    .mode-pink .btn-eq:hover { background-color: #ff5691; }
+
+    .mode-pink body { background-color: #ffffff; }
+
+    .mode-clean .btn-op,
+    .mode-clean .btn-num,
+    .mode-clean .btn-action,
+    .mode-clean .btn-eq {
+      background-color: white;
+      border: 1px solid #ddd;
+      color: #4a4a4a;
+    }
+    .mode-clean .btn-op:hover,
+    .mode-clean .btn-num:hover,
+    .mode-clean .btn-action:hover,
+    .mode-clean .btn-eq:hover {
+      background-color: #f2f2f2;
+    }
+    .mode-clean body { background-color: white; }
+
+    .toggle-circle { transition: transform .2s; }
+  </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-4 mode-pink">
+
+  <main class="w-full max-w-xl">
+    <div class="bg-white shadow-lg rounded-2xl p-4 sm:p-6">
+
+      <div class="flex items-center justify-between mb-4">
+        <h1 class="text-2xl font-semibold">Kalkulator</h1>
+
+        <label class="flex items-center cursor-pointer">
+          <span class="mr-2 text-sm">Tema</span>
+          <div class="relative w-12 h-6 bg-pink-200 rounded-full">
+            <input id="modeToggle" type="checkbox" class="hidden">
+            <div id="toggleDot" class="absolute w-5 h-5 bg-white rounded-full top-0.5 left-0.5 toggle-circle"></div>
+          </div>
+        </label>
+      </div>
+
+      <div class="mb-4">
+        <div class="rounded-lg border border-slate-200 p-3 bg-slate-50">
+          <div id="historySmall" class="text-sm text-slate-400 min-h-[1rem]"></div>
+          <div id="display" class="display text-right text-3xl sm:text-4xl font-mono leading-tight break-words">
+            0
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-4 gap-2">
+
+        <button id="mc" class="py-3 rounded-lg btn-op">MC</button>
+        <button id="mr" class="py-3 rounded-lg btn-op">MR</button>
+        <button id="mPlus" class="py-3 rounded-lg btn-op">M+</button>
+        <button id="mMinus" class="py-3 rounded-lg btn-op">M-</button>
+
+        <button id="ce" class="py-3 rounded-lg btn-action">CE</button>
+        <button id="c" class="py-3 rounded-lg btn-action">C</button>
+        <button id="back" class="py-3 rounded-lg btn-num">Del</button>
+        <button data-op="÷" class="py-3 rounded-lg btn-op">÷</button>
+
+        <button data-num="7" class="py-3 rounded-lg btn-num">7</button>
+        <button data-num="8" class="py-3 rounded-lg btn-num">8</button>
+        <button data-num="9" class="py-3 rounded-lg btn-num">9</button>
+        <button data-op="×" class="py-3 rounded-lg btn-op">×</button>
+
+        <button data-num="4" class="py-3 rounded-lg btn-num">4</button>
+        <button data-num="5" class="py-3 rounded-lg btn-num">5</button>
+        <button data-num="6" class="py-3 rounded-lg btn-num">6</button>
+        <button data-op="-" class="py-3 rounded-lg btn-op">−</button>
+
+        <button data-num="1" class="py-3 rounded-lg btn-num">1</button>
+        <button data-num="2" class="py-3 rounded-lg btn-num">2</button>
+        <button data-num="3" class="py-3 rounded-lg btn-num">3</button>
+        <button data-op="+" class="py-3 rounded-lg btn-op">+</button>
+
+        <button data-num="0" class="col-span-2 py-3 rounded-lg btn-num">0</button>
+        <button id="dot" class="py-3 rounded-lg btn-num">.</button>
+        <button id="equals" class="py-3 rounded-lg btn-eq">=</button>
+      </div>
+
+      <div class="mt-4 grid grid-cols-2 gap-4">
+        <div class="bg-slate-50 p-3 rounded-lg">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-sm font-medium">History</h3>
+            <button id="clearHistory" class="text-xs text-slate-500 hover:underline">Clear</button>
+          </div>
+          <div id="historyList" class="history-scroll text-sm text-slate-700"></div>
+        </div>
+
+        <div class="bg-slate-50 p-3 rounded-lg">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-sm font-medium">Memory</h3>
+            <div id="memIndicator" class="text-xs text-slate-500">MC</div>
+          </div>
+          <div class="text-lg font-mono" id="memValue">0</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
